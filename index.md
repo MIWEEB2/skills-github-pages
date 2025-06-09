@@ -1,3 +1,3 @@
 ---
-title:bievenido a mi pagina nui
+title: bievenido a mi pagina nui
 ---
