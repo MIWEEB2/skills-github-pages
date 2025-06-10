@@ -74,31 +74,28 @@ title: bievenido a mi pagina nui
                 </a>
             </div>
 
-            <div class="contact-form-container">
-                <h4>O envíame un mensaje directo:</h4>
-                <form id="contactForm" action="https://script.google.com/macros/s/AKfycbx4IoXAvMvmypXSxzybrR17rTtbaNtbWUG0Ker50EmbU1TgX9ZzwFUbSCC_IgOFH9hF/exec" method="POST">
-                    <div class="form-group">
-                        <label for="nombre">Nombre Completo:</label>
-                        <input type="text" id="nombre" name="nombre" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="telefono">Teléfono (Opcional):</label>
-                        <input type="tel" id="telefono" name="telefono">
-                    </div>
-                    <div class="form-group">
-                        <label for="mensaje">Tu Mensaje:</label>
-                        <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
-                    </div>
-                    <button type="submit" class="btn primary-btn">Enviar Mensaje</button>
-                    <p id="formStatus" class="form-status-message"></p>
-                </form>
-            </div>
+           <div class="contact-form-container">
+    <h4>O envíame un mensaje directo:</h4>
+    <form id="contactForm"> <div class="form-group">
+            <label for="nombre">Nombre Completo:</label>
+            <input type="text" id="nombre" name="nombre" required>
         </div>
-    </section>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="telefono">Teléfono (Opcional):</label>
+            <input type="tel" id="telefono" name="telefono">
+        </div>
+        <div class="form-group">
+            <label for="mensaje">Tu Mensaje:</label>
+            <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn primary-btn" id="submitBtn">Enviar Mensaje</button>
+        <p id="formStatus" class="form-status-message"></p>
+    </form>
+</div>
 
     <footer class="footer">
         <div class="container">
@@ -142,4 +139,45 @@ title: bievenido a mi pagina nui
         });
     </script>
 </body>
+            <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx4IoXAvMvmypXSxzybrR17rTtbaNtbWUG0Ker50EmbU1TgX9ZzwFUbSCC_IgOFH9hF/exec'; // ¡Asegúrate de que esta URL sea la correcta de tu despliegue!
+    const form = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const formStatus = document.getElementById('formStatus');
+
+    form.addEventListener('submit', e => {
+        e.preventDefault(); // Evita el envío tradicional del formulario (que recarga la página)
+        submitBtn.disabled = true; // Deshabilita el botón para evitar múltiples envíos
+        formStatus.textContent = 'Enviando mensaje...'; // Muestra un mensaje de carga
+        formStatus.style.color = '#007bff'; // O el color que desees para "enviando"
+
+        // Convierte los datos del formulario a un objeto FormData
+        const formData = new FormData(form);
+
+        fetch(scriptURL, {
+            method: 'POST',
+            body: formData // Envía el FormData directamente
+        })
+        .then(response => response.json()) // Espera una respuesta JSON del script de Google
+        .then(data => {
+            if (data.result === 'success') {
+                formStatus.textContent = '¡Mensaje enviado con éxito!';
+                formStatus.style.color = '#28a745'; // Color para éxito (verde)
+                form.reset(); // Limpia el formulario
+            } else {
+                formStatus.textContent = 'Error al enviar el mensaje. Inténtalo de nuevo. ' + (data.error ? data.error : ''); // Muestra el error
+                formStatus.style.color = '#dc3545'; // Color para error (rojo)
+                console.error('Error del script de Google:', data.error); // Para depuración
+            }
+        })
+        .catch(error => {
+            formStatus.textContent = 'Hubo un problema de conexión. Por favor, revisa tu conexión a internet e inténtalo de nuevo.';
+            formStatus.style.color = '#dc3545'; // Color para error de red
+            console.error('Error de red o fetch:', error); // Para depuración
+        })
+        .finally(() => {
+            submitBtn.disabled = false; // Vuelve a habilitar el botón
+        });
+    });
+</script>
 </html>
