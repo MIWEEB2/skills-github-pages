@@ -115,37 +115,40 @@ title: bievenido a mi pagina nui
         const submitBtn = document.getElementById('submitBtn');
         const formStatus = document.getElementById('formStatus');
 
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            submitBtn.disabled = true;
-            formStatus.textContent = 'Enviando mensaje...';
-            formStatus.style.color = '#007bff';
+         form.addEventListener('submit', e => {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        formStatus.textContent = 'Enviando mensaje...';
+        formStatus.style.color = '#007bff';
 
-            const formData = new FormData(form);
+        // Convierte FormData a URLSearchParams
+        const formData = new FormData(form);
+        const params = new URLSearchParams(formData);
 
-            fetch(scriptURL, { method: 'POST', body: formData })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result === 'success') {
-                    formStatus.textContent = '¡Mensaje enviado con éxito!';
-                    formStatus.style.color = '#28a745';
-                    form.reset();
-                } else {
-                    formStatus.textContent = 'Error al enviar el mensaje. ' + (data.error || '');
-                    formStatus.style.color = '#dc3545';
-                    console.error('Error del script de Google:', data.error);
-                }
-            })
-            .catch(error => {
-                formStatus.textContent = 'Hubo un problema de conexión.';
+        fetch(scriptURL, {
+            method: 'POST',
+            body: params
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.result === 'success') {
+                formStatus.textContent = '¡Mensaje enviado con éxito!';
+                formStatus.style.color = '#28a745';
+                form.reset();
+            } else {
+                formStatus.textContent = 'Error al enviar: ' + (data.error || '');
                 formStatus.style.color = '#dc3545';
-                console.error('Error de red o fetch:', error);
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-            });
+            }
+        })
+        .catch(err => {
+            console.error('Error en fetch:', err);
+            formStatus.textContent = 'Hubo un problema de conexión. Inténtalo de nuevo.';
+            formStatus.style.color = '#dc3545';
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
         });
-    </script>
-
+    });
+</script>
 </body>
 </html>
