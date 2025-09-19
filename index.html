@@ -11,7 +11,7 @@ title: bievenido a mi pagina nui
     
     <link rel="stylesheet" href="style.css">
     
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght=700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <link rel="icon" type="image/png" href="favicon.png"> 
 </head>
@@ -74,110 +74,78 @@ title: bievenido a mi pagina nui
                 </a>
             </div>
 
-           <div class="contact-form-container">
-    <h4>O envíame un mensaje directo:</h4>
-    <form id="contactForm"> <div class="form-group">
-            <label for="nombre">Nombre Completo:</label>
-            <input type="text" id="nombre" name="nombre" required>
+            <div class="contact-form-container">
+                <h4>O envíame un mensaje directo:</h4>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="nombre">Nombre Completo:</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono (Opcional):</label>
+                        <input type="tel" id="telefono" name="telefono">
+                    </div>
+                    <div class="form-group">
+                        <label for="mensaje">Tu Mensaje:</label>
+                        <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn primary-btn" id="submitBtn">Enviar Mensaje</button>
+                    <p id="formStatus" class="form-status-message"></p>
+                </form>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="telefono">Teléfono (Opcional):</label>
-            <input type="tel" id="telefono" name="telefono">
-        </div>
-        <div class="form-group">
-            <label for="mensaje">Tu Mensaje:</label>
-            <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
-        </div>
-        <button type="submit" class="btn primary-btn" id="submitBtn">Enviar Mensaje</button>
-        <p id="formStatus" class="form-status-message"></p>
-    </form>
-</div>
+    </section>
 
     <footer class="footer">
         <div class="container">
             <p>&copy; 2025 [Tu Nombre/Tu Firma]. Todos los derechos reservados. | [Tu Nombre] - Abogado Penalista</p>
             <div class="footer-social">
                 <a href="https://www.instagram.com/TU_USUARIO_INSTAGRAM/" target="_blank" aria-label="Instagram"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram"></a>
-                </div>
+            </div>
         </div>
     </footer>
 
     <script>
-        const contactForm = document.getElementById('contactForm');
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbx4IoXAvMvmypXSxzybrR17rTtbaNtbWUG0Ker50EmbU1TgX9ZzwFUbSCC_IgOFH9hF/exec'; 
+        const form = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
         const formStatus = document.getElementById('formStatus');
 
-        contactForm.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', e => {
             e.preventDefault();
+            submitBtn.disabled = true;
             formStatus.textContent = 'Enviando mensaje...';
-            formStatus.className = 'form-status-message sending';
+            formStatus.style.color = '#007bff';
 
-            const response = await fetch(contactForm.action, {
-                method: contactForm.method,
-                body: new FormData(contactForm),
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
+            const formData = new FormData(form);
 
-            if (response.ok) {
-                formStatus.textContent = '¡Mensaje enviado con éxito! Te contactaré a la brevedad.';
-                formStatus.className = 'form-status-message success';
-                contactForm.reset();
-            } else {
-                const data = await response.json();
-                if (data.errors) {
-                    formStatus.textContent = 'Error: ' + data.errors.map(error => error.message).join(', ');
+            fetch(scriptURL, { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    formStatus.textContent = '¡Mensaje enviado con éxito!';
+                    formStatus.style.color = '#28a745';
+                    form.reset();
                 } else {
-                    formStatus.textContent = 'Ocurrió un error al enviar el mensaje. Por favor, inténtalo de nuevo.';
+                    formStatus.textContent = 'Error al enviar el mensaje. ' + (data.error || '');
+                    formStatus.style.color = '#dc3545';
+                    console.error('Error del script de Google:', data.error);
                 }
-                formStatus.className = 'form-status-message error';
-            }
+            })
+            .catch(error => {
+                formStatus.textContent = 'Hubo un problema de conexión.';
+                formStatus.style.color = '#dc3545';
+                console.error('Error de red o fetch:', error);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+            });
         });
     </script>
+
 </body>
-            <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx4IoXAvMvmypXSxzybrR17rTtbaNtbWUG0Ker50EmbU1TgX9ZzwFUbSCC_IgOFH9hF/exec'; // ¡Asegúrate de que esta URL sea la correcta de tu despliegue!
-    const form = document.getElementById('contactForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const formStatus = document.getElementById('formStatus');
-
-    form.addEventListener('submit', e => {
-        e.preventDefault(); // Evita el envío tradicional del formulario (que recarga la página)
-        submitBtn.disabled = true; // Deshabilita el botón para evitar múltiples envíos
-        formStatus.textContent = 'Enviando mensaje...'; // Muestra un mensaje de carga
-        formStatus.style.color = '#007bff'; // O el color que desees para "enviando"
-
-        // Convierte los datos del formulario a un objeto FormData
-        const formData = new FormData(form);
-
-        fetch(scriptURL, {
-            method: 'POST',
-            body: formData // Envía el FormData directamente
-        })
-        .then(response => response.json()) // Espera una respuesta JSON del script de Google
-        .then(data => {
-            if (data.result === 'success') {
-                formStatus.textContent = '¡Mensaje enviado con éxito!';
-                formStatus.style.color = '#28a745'; // Color para éxito (verde)
-                form.reset(); // Limpia el formulario
-            } else {
-                formStatus.textContent = 'Error al enviar el mensaje. Inténtalo de nuevo. ' + (data.error ? data.error : ''); // Muestra el error
-                formStatus.style.color = '#dc3545'; // Color para error (rojo)
-                console.error('Error del script de Google:', data.error); // Para depuración
-            }
-        })
-        .catch(error => {
-            formStatus.textContent = 'Hubo un problema de conexión. Por favor, revisa tu conexión a internet e inténtalo de nuevo.';
-            formStatus.style.color = '#dc3545'; // Color para error de red
-            console.error('Error de red o fetch:', error); // Para depuración
-        })
-        .finally(() => {
-            submitBtn.disabled = false; // Vuelve a habilitar el botón
-        });
-    });
-</script>
 </html>
